@@ -2,7 +2,20 @@
 
 A comprehensive health monitoring system that provides personalized weather alerts, health check-ins, and emergency detection via WhatsApp integration.
 
-## Demo Deployment
+## GitHub Pages Demo
+
+The standalone interactive demo is in `docs/index.html`. It uses fictional data and simulated weather and messages; it does not send WhatsApp messages, collect personal information, or connect to the backend. Open the file locally to try it without installing anything.
+
+To publish it:
+
+1. Commit and push the `docs` folder to the repository's `main` branch.
+2. On GitHub, open the repository's **Settings > Pages**.
+3. Under **Build and deployment**, select **Deploy from a branch**, choose `main` and `/docs`, then save.
+4. Once GitHub finishes publishing, open the URL shown in Pages settings. For this repository, it should be `https://baldturkey.github.io/Care_Cast/` unless its owner or name changes.
+
+No database, API keys, or WhatsApp account are needed for this demo. The GitHub account enabling Pages needs administrator access to the repository. Availability may depend on the repository's visibility and GitHub plan.
+
+## Connected Prototype Deployment
 
 GitHub Pages only hosts static files. The onboarding form and weather demo need the Express API, so Pages alone cannot run them. The repository includes a Vercel Express entry point and routing configuration, but the complete system also needs PostgreSQL, Redis, Twilio, and a continuously running worker outside Vercel.
 
