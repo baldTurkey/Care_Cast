@@ -1740,7 +1740,7 @@ app.post("/api/send-weather-alert", async (req, res) => {
 
       const message = await twilio.messages.create({
         body: alert.message,
-        from: process.env.TWILIO_WHATSAPP_NUMBER,
+        from: whatsappConfig.from,
         to: `whatsapp:${phoneNumber}`,
       });
 
@@ -1965,5 +1965,8 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-// Start the server
-startServer();
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = app;
