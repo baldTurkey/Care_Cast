@@ -253,25 +253,9 @@ const updateMonitoringFrequency = async (
   }
 };
 
-module.exports = {
-  whatsappQueue,
-  healthCronQueue,
-  scheduleHealthCheckup,
-  scheduleDailyCheckup,
-  scheduleWeatherAlertCheckin,
-  cancelHealthCheckups,
-  updateMonitoringFrequency,
-  get weatherMonitor() {
-    return require("./jobs/weatherMonitor");
-  },
-};
-
-// Initialize jobs after exports to avoid circular dependency
-setImmediate(() => {
-  const weatherMonitor = require("./jobs/weatherMonitor");
-
+const scheduleMonitoringJobs = async () => {
   // Schedule weather monitoring job (every 30 minutes)
-  healthCronQueue.add(
+  await healthCronQueue.add(
     "weather-monitoring",
     {},
     {
@@ -281,7 +265,7 @@ setImmediate(() => {
   );
 
   // Schedule heat wave monitoring job (every 2 hours)
-  healthCronQueue.add(
+  await healthCronQueue.add(
     "heat-wave-monitoring",
     {},
     {
@@ -296,4 +280,18 @@ setImmediate(() => {
   console.log(
     "✅ Heat wave monitoring job scheduled (every 30 seconds - DEMO MODE)"
   );
-});
+};
+
+module.exports = {
+  whatsappQueue,
+  healthCronQueue,
+  scheduleHealthCheckup,
+  scheduleDailyCheckup,
+  scheduleWeatherAlertCheckin,
+  scheduleMonitoringJobs,
+  cancelHealthCheckups,
+  updateMonitoringFrequency,
+  get weatherMonitor() {
+    return require("./jobs/weatherMonitor");
+  },
+};

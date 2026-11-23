@@ -11,6 +11,12 @@ const connection = getRedisConnection();
 const prisma = getPrismaClient();
 const twilio = getTwilioClient();
 const whatsappConfig = getWhatsAppConfig();
+const { scheduleMonitoringJobs } = require("./queue");
+
+scheduleMonitoringJobs().catch((error) => {
+  console.error("Failed to schedule monitoring jobs:", error);
+  process.exitCode = 1;
+});
 
 // WhatsApp message worker
 const whatsappWorker = new Worker(
