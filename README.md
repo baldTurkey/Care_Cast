@@ -2,11 +2,27 @@
 
 A comprehensive health monitoring system that provides personalized weather alerts, health check-ins, and emergency detection via WhatsApp integration.
 
+## Demo Deployment
+
+GitHub Pages only hosts static files. The onboarding form and weather demo need the Express API, so Pages alone cannot run them. The repository includes a Vercel Express entry point and routing configuration, but the complete system also needs PostgreSQL, Redis, Twilio, and a continuously running worker outside Vercel.
+
+**Do not publish this application with real patient information or live messaging credentials.** The API has unauthenticated patient and messaging operations, webhooks do not verify Twilio signatures, and dependencies have known security vulnerabilities. The weather demo also sends to a hard-coded phone number; do not press its buttons without correcting the recipient. This is not a production-ready medical service.
+
+For a restricted, synthetic-data-only demo after addressing those risks:
+
+1. Import the GitHub repository into Vercel. Use the existing configuration and enable deployment protection before adding credentials. Vercel authentication protection also blocks Twilio callbacks unless an appropriate secure bypass is configured.
+2. Provision PostgreSQL and Redis accessible from both Vercel and the worker host. Set `DATABASE_URL`, `REDIS_HOST`, `REDIS_PORT`, and, if required, `REDIS_PASSWORD` and `REDIS_TLS=true` on both hosts. Run `npx prisma db push` against the demo database. The install step generates the Prisma client.
+3. Configure `TWILIO_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_SANDBOX_NUMBER`, and `BASE_URL` on both hosts. The sandbox recipient must have joined the Twilio sandbox. Configure `GEMINI_API_KEY` if using the AI symptom analysis.
+4. Run `npm run worker` on a separate always-on Node.js host with the same environment variables. Vercel functions do not run the BullMQ worker continuously. The worker schedules recurring monitoring jobs when it starts.
+5. Set Twilio's incoming WhatsApp webhook to `https://YOUR-DOMAIN/twilio/whatsapp-webhook` and its status callback to `https://YOUR-DOMAIN/twilio/status-webhook`. Test with synthetic data and a consenting sandbox recipient only.
+
+Visit `/onboarding.html` for the form, `/weather-demo` for the weather interface, and `/health` for a process response. A successful `/health` response does **not** check database, Redis, Twilio, or worker connectivity. The end-to-end flows have not been verified without those services.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js (v16+)
+- Node.js (v20+ recommended)
 - Redis server
 - PostgreSQL database
 - Twilio account with WhatsApp API access
@@ -35,7 +51,7 @@ REDIS_PORT=6379
 REDIS_PASSWORD=
 
 # Twilio WhatsApp
-TWILIO_ACCOUNT_SID=your_account_sid
+TWILIO_SID=your_account_sid
 TWILIO_AUTH_TOKEN=your_auth_token
 TWILIO_WHATSAPP_SANDBOX_NUMBER=+14155238886
 TWILIO_WHATSAPP_SANDBOX_CODE=your_sandbox_code
@@ -46,7 +62,7 @@ BASE_URL=https://your-ngrok-url.ngrok-free.app
 
 # AI Services (Optional)
 OPENAI_API_KEY=your_openai_key
-GOOGLE_AI_API_KEY=your_google_ai_key
+GEMINI_API_KEY=your_google_ai_key
 ```
 
 3. **Set up the database:**
